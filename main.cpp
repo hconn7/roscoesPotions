@@ -7,8 +7,8 @@
 #include <vector>
 
 namespace PlayerGold {
-int maxGold{120};
-int minGold{80};
+constexpr int maxGold{120};
+constexpr int minGold{80};
 
 } // namespace PlayerGold
 namespace Potion {
@@ -42,17 +42,23 @@ constexpr int minPotionValue{minPotionVal()};
 class Player {
 public:
   void UpdateInventory(int idx) {
+    int cost{Potion::potionCost[idx]};
+    if (m_gold < cost) {
+      std::cout << "You can't afford that.\n";
+      return;
+    }
     std::string_view potion{Potion::potionName[idx]};
     m_potionInventory.push_back(potion);
-    int cost{Potion::potionCost[idx]};
     m_gold -= cost;
 
     std::cout << "Thanks! You bought " << Potion::potionName[idx]
               << " and now have " << m_gold << " gold. \n";
   }
-  int getPlayerGold() { return m_gold; }
-  bool getIsPlaying() { return m_isPlaying; }
-  std::vector<std::string_view> getIventory() { return m_potionInventory; }
+  int getPlayerGold() const { return m_gold; }
+  bool getIsPlaying() const { return m_isPlaying; }
+  const std::vector<std::string_view>& getIventory() const {
+    return m_potionInventory;
+  }
   void setNotPlaying() {
     m_isPlaying = false;
     return;
@@ -98,8 +104,6 @@ private:
 };
 void shop() {
   std::cout << "Here is out selection for today:\n";
-
-  Potion::Type potion;
 
   for (auto potion : Potion::types) {
     std::cout << potion << ") " << Potion::potionName[potion] << " costs "
